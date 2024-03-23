@@ -78,12 +78,7 @@ class NewFragment : Fragment() {
             // *
 
             val newMemo = MemoModel(titleText.toString(), messageText.toString(), dateString, dateString)
-            if (imageBitmapData != null) {
-                MemoModelStorage.saveMemo(context, newMemo, imageBitmapData!!)
-            }
-            else {
-                
-            }
+                MemoModelStorage.saveMemo(context, newMemo, imageBitmapData)
 
             // navigate back to ListFragment
             findNavController().navigate(R.id.action_newFragment_to_listFragment)

@@ -30,14 +30,17 @@ object MemoModelStorage {
         return memoList
     }
 
-    fun saveMemo(context: Context, memo: MemoModel, imageBitmap: Bitmap) {
+    fun saveMemo(context: Context, memo: MemoModel, imageBitmap: Bitmap?) {
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val memoListJson = sharedPreferences.getString(PREF_KEY_MEMOS, "[]")
 
         val memoArray = JSONArray(memoListJson)
-
-        saveImageToSharedPreferences(context, memo.timestamp, imageBitmap)
-
+        if (imageBitmap != null) {
+            saveImageToSharedPreferences(context, memo.timestamp, imageBitmap)
+        }
+        else {
+            memo.imageReference = "image_placeholder.jpg"
+        }
         val memoJson = memo.toJson()
         memoArray.put(memoJson)
 
@@ -46,9 +49,6 @@ object MemoModelStorage {
         editor.apply()
     }
 
-    fun saveMemoWithoutImage(context: Context, memo: MemoModel) {
-
-    }
 
 
     fun deleteMemo(context: Context, memoTimestamp: String) {
@@ -87,20 +87,21 @@ object MemoModelStorage {
         // Retrieve the Base64 encoded string from SharedPreferences
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val encodedString = sharedPreferences.getString(key, null)
-
+        Log.d("MemoModelStorage", "encoded string: " +encodedString)
         if (encodedString != null) {
             // Decode the Base64 string into a ByteArray
             val byteArray = Base64.decode(encodedString, Base64.DEFAULT)
 
             // Convert the ByteArray back into a Bitmap
-            val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+            var bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
 
             // Set the Bitmap to the ImageView
             return bitmap
         } else {
             // Handle case when no image is found in SharedPreferences
-            // You can set a default image or take other appropriate action
+            Log.d("MemoModelStorage", "no photo was taken")
             return BitmapFactory.decodeResource(context.resources, R.drawable.image_placeholder)
+
         }
     }
 }
