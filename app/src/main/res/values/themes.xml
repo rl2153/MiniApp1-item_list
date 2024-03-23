@@ -9,6 +9,5 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="MyHintTextStyle">
         <item name="android:textColorHint">#808080</item> <!-- Optional: Change hint text color -->
-        <!-- Add other style attributes as needed -->
     </style>
 </resources>

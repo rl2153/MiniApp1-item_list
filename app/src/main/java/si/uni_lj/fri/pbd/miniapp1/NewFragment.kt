@@ -7,12 +7,14 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.fragment.findNavController
@@ -77,11 +79,20 @@ class NewFragment : Fragment() {
             val dateString = dateFormat.format(Date(currentTimeMillis))
             // *
 
-            val newMemo = MemoModel(titleText.toString(), messageText.toString(), dateString, dateString)
+            Log.d("NewFragment", "titleText: "+titleText.toString())
+            Log.d("NewFragment", "messageText: "+messageText.toString())
+
+            // if title or description are empty, show a toast message to the user
+            if (titleText.toString() == "" || messageText.toString() == "") {
+                Toast.makeText(context, "Please provide title and description", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                val newMemo = MemoModel(titleText.toString(), messageText.toString(), dateString, dateString)
                 MemoModelStorage.saveMemo(context, newMemo, imageBitmapData)
 
-            // navigate back to ListFragment
-            findNavController().navigate(R.id.action_newFragment_to_listFragment)
+                // navigate back to ListFragment
+                findNavController().navigate(R.id.action_newFragment_to_listFragment)
+            }
         }
 
         return view
