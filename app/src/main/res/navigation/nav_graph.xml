@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragment_list">
+
+    <fragment
+        android:id="@+id/fragment_list"
+        android:name="si.uni_lj.fri.pbd.miniapp1.ListFragment"
+        android:label="List Fragment"
+        tools:layout="@layout/fragment_list" >
+        <action
+            android:id="@+id/action_listFragment_to_newFragment"
+            app:destination="@id/fragment_new" />
+        <action
+            android:id="@+id/action_listFragment_to_detailsFragment"
+            app:destination="@id/fragment_details" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_new"
+        android:name="si.uni_lj.fri.pbd.miniapp1.NewFragment"
+        android:label="New Fragment"
+        tools:layout="@layout/fragment_new" />
+        <action
+            android:id="@+id/action_newFragment_to_listFragment"
+            app:destination="@+id/fragment_list"/>
+
+    <fragment
+        android:id="@+id/fragment_details"
+        android:name="si.uni_lj.fri.pbd.miniapp1.DetailsFragment"
+        android:label="Details Fragment"
+        tools:layout="@layout/fragment_details" />
+        <action
+            android:id="@+id/action_detailsFragment_to_listFragment"
+            app:destination="@+id/fragment_list"/>
+</navigation>
