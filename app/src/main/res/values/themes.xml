@@ -8,6 +8,6 @@
     <style name="Theme.MiniApp1" parent="Base.Theme.MiniApp1" />
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="MyHintTextStyle">
-        <item name="android:textColorHint">#808080</item> <!-- Optional: Change hint text color -->
+        <item name="android:textColorHint">#808080</item> <!-- Change hint text color -->
     </style>
 </resources>

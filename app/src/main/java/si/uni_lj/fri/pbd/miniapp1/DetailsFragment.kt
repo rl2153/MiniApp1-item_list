@@ -30,6 +30,7 @@ class DetailsFragment : Fragment() {
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        // get data from shared preferences
         val jsonString = arguments?.getString("jsonObject")
         var timestamp: String? = null
         var title: String? = null
@@ -38,6 +39,7 @@ class DetailsFragment : Fragment() {
         if (jsonString != null) {
             val jsonObject = JSONObject(jsonString)
             val memoObject = MemoModel.fromJson(jsonObject)
+
             // Implement UI setup
             title = memoObject.title
             binding.title.text = title
@@ -50,6 +52,7 @@ class DetailsFragment : Fragment() {
         }
 
         // Implement button click listeners
+        // delete button listener
         binding.btnDelete.setOnClickListener {
             if (timestamp != null) {
                 MemoModelStorage.deleteMemo(requireContext(), timestamp)
@@ -58,6 +61,7 @@ class DetailsFragment : Fragment() {
             findNavController().navigate(R.id.action_detailsFragment_to_listFragment)
         }
 
+        // share button listener
         binding.btnShare.setOnClickListener {
            sendEmail(title, description, timestamp, imageBitmap)
         }
@@ -65,49 +69,30 @@ class DetailsFragment : Fragment() {
         return view
     }
 
-    fun sendEmail(title: String?, description: String?, timestamp: String?, bitmap: Bitmap?) {
-        // KOPIRANO OD HANE
+    private fun sendEmail(title: String?, description: String?, timestamp: String?, bitmap: Bitmap?) {
+
         val intent = Intent(Intent.ACTION_SEND).apply {
+            // type indicates that this intent is for sending email
             type = "message/rfc822"
+            // we do not specify recipients
             putExtra(Intent.EXTRA_EMAIL, arrayOf(""))
+            // add title
             putExtra(Intent.EXTRA_SUBJECT, title)
+            // add body
             putExtra(Intent.EXTRA_TEXT, "${description}\nTimestamp: ${timestamp}")
 
+            // attach the photo
             if (bitmap != null) {
                 val imageUri = Uri.parse(MediaStore.Images.Media.insertImage(context?.contentResolver, bitmap, "Attachment", null))
                 putExtra(Intent.EXTRA_STREAM, imageUri)
             }
         }
         try {
-            startActivity(Intent.createChooser(intent, "Send mail..."))
-        } catch (e: IOException) {
+            startActivity(Intent.createChooser(intent, "Send mail"))
+        } catch (e: Exception) {
             e.printStackTrace()
         }
-        // KOPIRANO OD HANE KONEC
     }
-
-    private fun saveBitmapToFile(bitmap: Bitmap): Uri? {
-
-        val context = requireContext().applicationContext
-
-        val cachePath = File(context.cacheDir, "images")
-        cachePath.mkdirs()
-        val file = File(cachePath, "image.jpg")
-
-        try {
-            val stream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            stream.flush()
-            stream.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return null
-        }
-        return FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
-    }
-
-
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

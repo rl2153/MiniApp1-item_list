@@ -16,7 +16,5 @@ class MainActivity : AppCompatActivity() {
         // sets the UI defined in activity_main.xml as the content of the MainActivity
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
-
     }
 }

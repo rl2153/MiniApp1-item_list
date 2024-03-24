@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream
 object MemoModelStorage {
     private const val PREF_KEY_MEMOS = "memos"
 
+    // gets memos from shared preferences
     fun loadMemos(context: Context): List<MemoModel>{
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val memoListJson = sharedPreferences.getString(PREF_KEY_MEMOS, "[]")
@@ -30,32 +31,39 @@ object MemoModelStorage {
         return memoList
     }
 
+    // saves a memo to shared preferences
     fun saveMemo(context: Context, memo: MemoModel, imageBitmap: Bitmap?) {
+        // first we get the list of all the memos
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val memoListJson = sharedPreferences.getString(PREF_KEY_MEMOS, "[]")
-
         val memoArray = JSONArray(memoListJson)
+
+        // save the image bitmap to shared preferences
         if (imageBitmap != null) {
             saveImageToSharedPreferences(context, memo.timestamp, imageBitmap)
         }
+        // if no image was taken, set image reference to the default image
         else {
             memo.imageReference = "image_placeholder.jpg"
         }
-        val memoJson = memo.toJson()
-        memoArray.put(memoJson)
 
+        // convert memo object to json
+        val memoJson = memo.toJson()
+        // add it to array of all memos
+        memoArray.put(memoJson)
+        // save the modified array to shared preferences
         val editor = sharedPreferences.edit()
         editor.putString(PREF_KEY_MEMOS, memoArray.toString())
         editor.apply()
     }
 
 
-
+    // deletes the memo
     fun deleteMemo(context: Context, memoTimestamp: String) {
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val memoListJson = sharedPreferences.getString(PREF_KEY_MEMOS, "[]")
         val memoArray = JSONArray(memoListJson)
-
+        // find and remove the deleted memo from memo array
         for (i in 0 until memoArray.length()) {
             val memoJson = memoArray.getJSONObject(i)
             val timestamp = memoJson.getString("timestamp")
@@ -64,11 +72,13 @@ object MemoModelStorage {
                 break
             }
         }
+        // saves the modified memo array back to shared preferences
         val editor = sharedPreferences.edit()
         editor.putString(PREF_KEY_MEMOS, memoArray.toString())
         editor.apply()
     }
 
+    // saves image bitmap to shared preferences
     private fun saveImageToSharedPreferences(context: Context, key: String, bitmap: Bitmap) {
         // Convert the Bitmap to a Base64 encoded string
         val byteArrayOutputStream = ByteArrayOutputStream()
@@ -94,8 +104,6 @@ object MemoModelStorage {
 
             // Convert the ByteArray back into a Bitmap
             var bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-
-            // Set the Bitmap to the ImageView
             return bitmap
         } else {
             // Handle case when no image is found in SharedPreferences

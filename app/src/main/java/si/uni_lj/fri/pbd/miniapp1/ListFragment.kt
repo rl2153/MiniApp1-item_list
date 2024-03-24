@@ -21,7 +21,7 @@ class ListFragment : Fragment() {
 
     private var recyclerView: RecyclerView? = null
     private var layoutManager: RecyclerView.LayoutManager? = null
-    private var adapter: RecyclerAdapter? = null
+    //private var adapter: RecyclerAdapter? = null
 
     override fun onCreateView(
         // inflater is used to inflate xml layouts into View objects
@@ -34,8 +34,7 @@ class ListFragment : Fragment() {
         _binding = FragmentListBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        // TODO: Implement RecyclerView setup and item click listener
-        // RecyclerView
+        // Implement RecyclerView setup and item click listener
         recyclerView = binding.recyclerView
         layoutManager = LinearLayoutManager(view.context)
         recyclerView?.layoutManager = layoutManager
@@ -44,28 +43,25 @@ class ListFragment : Fragment() {
 
         val memoList = MemoModelStorage.loadMemos(requireContext())
 
-        //adapter = RecyclerAdapter(requireContext(), memoList, navController)
+        // callback used when an item of recycler view is clicked
         val adapter = RecyclerAdapter(requireContext(), memoList) { position ->
             val clickedItem = memoList[position]
-            // Perform navigation or other actions based on the clicked item
             val memoJson = clickedItem.toJson()
             val bundle = Bundle()
+            // bundle the clicked item data so it can be sent
             bundle.putString("jsonObject", memoJson.toString())
-            //bundle.putSerializable("adapter", adapter)
+            // navigate to details fragment
             navController.navigate(R.id.action_listFragment_to_detailsFragment, bundle)
         }
         recyclerView?.adapter = adapter
 
-        // button click listener
+        // + button click listener for creating new memos
         binding.button.setOnClickListener {
-            // Navigate to the destination fragment
+            // Navigate to the new fragment
             navController.navigate(R.id.action_listFragment_to_newFragment)
         }
-
         return view
     }
-
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -28,12 +28,12 @@ class NewFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var context: Context
-
     private lateinit var imageView: ImageView
     private lateinit var buttonTakePicture: Button
     private lateinit var buttonSave: Button
     private lateinit var titleText: Editable
     private lateinit var messageText: Editable
+    private var imageBitmapData: Bitmap? = null
 
     private lateinit var takePictureLauncher: ActivityResultLauncher<Intent>
 
@@ -51,25 +51,33 @@ class NewFragment : Fragment() {
         buttonSave = binding.btnSave
         titleText = binding.title.text
         messageText = binding.text.text
-
         context = requireContext()
 
-        var imageBitmapData: Bitmap? = null
+        // if there was a previous state, preserve the data
+        if (savedInstanceState != null) {
+            // Restore inputted data
+            titleText = Editable.Factory.getInstance().newEditable(savedInstanceState.getCharSequence("titleText", ""))
+            messageText = Editable.Factory.getInstance().newEditable(savedInstanceState.getCharSequence("messageText", ""))
+            val imageBitmapData = savedInstanceState.getParcelable<Bitmap>("imageBitmapData")
+            imageView.setImageBitmap(imageBitmapData)
+        }
 
         // Initialize ActivityResultLauncher
+        // callback happens when user makes the action
         takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
+                // get the image bitmap
                 val data: Intent? = result.data
                 val imageBitmap = data?.extras?.get("data") as Bitmap
                 imageBitmapData = imageBitmap
                 imageView.setImageBitmap(imageBitmap)
             }
         }
-
+        // take photo button listener
         buttonTakePicture.setOnClickListener {
             dispatchTakePictureIntent()
         }
-
+        // save button listener
         buttonSave.setOnClickListener {
             // *TAKEN FROM CHATGPT
             // Get current timestamp in milliseconds
@@ -83,9 +91,10 @@ class NewFragment : Fragment() {
             Log.d("NewFragment", "messageText: "+messageText.toString())
 
             // if title or description are empty, show a toast message to the user
-            if (titleText.toString() == "" || messageText.toString() == "") {
+            if ((titleText.toString() == "" || messageText.toString() == "")) {
                 Toast.makeText(context, "Please provide title and description", Toast.LENGTH_SHORT).show()
             }
+            // if required data is provided, create a new memo object and save it
             else {
                 val newMemo = MemoModel(titleText.toString(), messageText.toString(), dateString, dateString)
                 MemoModelStorage.saveMemo(context, newMemo, imageBitmapData)
@@ -94,7 +103,6 @@ class NewFragment : Fragment() {
                 findNavController().navigate(R.id.action_newFragment_to_listFragment)
             }
         }
-
         return view
     }
 
@@ -103,8 +111,17 @@ class NewFragment : Fragment() {
         takePictureLauncher.launch(takePictureIntent)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Save bitmap when orientation changes
+        outState.putParcelable("imageBitmapData", imageBitmapData)
+
+        Log.d("NewFragment", "image bitmap data: "+imageBitmapData)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
 }

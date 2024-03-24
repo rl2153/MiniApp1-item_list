@@ -10,6 +10,7 @@ data class MemoModel(
     val timestamp: String,
     var imageReference: String
 ) {
+    // converts memo model object to json
     fun toJson(): JSONObject {
         val jsonObject = JSONObject()
         jsonObject.put("title", title)
@@ -18,6 +19,7 @@ data class MemoModel(
         jsonObject.put("timestamp", timestamp)
         return jsonObject
     }
+    // converts JSON object to memo model object
     companion object {
         fun fromJson(json: JSONObject): MemoModel {
             val title = json.getString("title")
